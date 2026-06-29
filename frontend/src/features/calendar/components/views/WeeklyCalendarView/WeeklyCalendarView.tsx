@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
-import { getWeekDates } from '@/utils/dateUtils';
+import { useMemo, useRef, useLayoutEffect } from 'react';
+import { getWeekDates, getMondayOfWeek } from '@/utils/dateUtils';
 import { Tag } from '@/types/tag';
 import DayHeaders from '@/features/calendar/components/DayHeaders';
 import TimeSidebar from '@/features/calendar/components/TimeSidebar';
@@ -23,9 +23,23 @@ export default function WeeklyCalendarView({ currentDate, tags, timezone }: Week
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const timeSidebarRef = useRef<HTMLDivElement>(null);
   const gridColumnsRef = useRef<HTMLDivElement>(null);
+  const gridAnimRef = useRef<HTMLDivElement>(null);
+  const prevMondayRef = useRef<Date>(getMondayOfWeek(currentDate));
 
   // Get week dates
   const datesToShow = useMemo(() => getWeekDates(currentDate, 'week'), [currentDate]);
+
+  // Slide grid columns in from the correct direction when navigating weeks
+  useLayoutEffect(() => {
+    const el = gridAnimRef.current;
+    if (!el) return;
+    const monday = getMondayOfWeek(currentDate);
+    if (monday.getTime() === prevMondayRef.current.getTime()) return;
+    const cls = monday > prevMondayRef.current ? 'nav-slide-forward' : 'nav-slide-backward';
+    el.classList.add(cls);
+    el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+    prevMondayRef.current = monday;
+  }, [currentDate]);
 
   // Calculate date range for query (7 days before, 30 days ahead)
   const startDate = useMemo(() => {
@@ -104,18 +118,20 @@ export default function WeeklyCalendarView({ currentDate, tags, timezone }: Week
             scrollTop={scrollPosition}
           />
 
-          <CalendarGrid
-            ref={gridColumnsRef}
-            dates={datesToShow}
-            blocks={blocks || []} // Pass blocks from React Query
-            viewMode="week"
-            onGridClick={handleGridClick}
-            onBlockInteractionStart={handleBlockMouseDown}
-            gridContainerRef={gridContainerRef}
-            onScroll={handleGridColumnsScroll}
-            scrollTop={scrollPosition}
-            tags={tags}
-          />
+          <div ref={gridAnimRef} className="flex-1 relative overflow-hidden">
+            <CalendarGrid
+              ref={gridColumnsRef}
+              dates={datesToShow}
+              blocks={blocks || []}
+              viewMode="week"
+              onGridClick={handleGridClick}
+              onBlockInteractionStart={handleBlockMouseDown}
+              gridContainerRef={gridContainerRef}
+              onScroll={handleGridColumnsScroll}
+              scrollTop={scrollPosition}
+              tags={tags}
+            />
+          </div>
         </div>
       </main>
     </div>

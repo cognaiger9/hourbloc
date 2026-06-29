@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, useEffect, useRef, memo } from 'react';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import { formatTime } from '@/utils/dateUtils';
 
@@ -53,6 +53,18 @@ export default memo(function CalendarBlockItem({
 
   const [hoveredEdge, setHoveredEdge] = useState<'top' | 'bottom' | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Detect drag release so we can play the drop-settle animation
+  const [justDropped, setJustDropped] = useState(false);
+  const prevIsDraggingRef = useRef(isDragging);
+  useEffect(() => {
+    if (prevIsDraggingRef.current && !isDragging) {
+      setJustDropped(true);
+      const t = setTimeout(() => setJustDropped(false), 350);
+      return () => clearTimeout(t);
+    }
+    prevIsDraggingRef.current = isDragging;
+  }, [isDragging]);
 
   const formatTimeRange = () => {
     const startTime = displayStartTime !== undefined ? displayStartTime : block.startTime;
@@ -185,10 +197,17 @@ export default memo(function CalendarBlockItem({
         borderRadius: '6px',
         boxShadow,
         transform,
+        // GPU hint while dragging/resizing so the compositor handles frames
+        willChange: (isDragging || isResizing) ? 'transform' : 'auto',
         // Only animate non-position properties so drag doesn't lag
         transition: isDragging || isResizing
-          ? 'box-shadow 0.1s ease, opacity 0.1s ease'
-          : 'transform 0.12s ease, box-shadow 0.15s ease, background-color 0.1s ease, border-color 0.1s ease',
+          ? 'box-shadow 0.1s var(--ease-standard), opacity 0.1s var(--ease-standard)'
+          : 'transform 0.12s var(--ease-standard), box-shadow 0.15s var(--ease-standard), background-color 0.1s var(--ease-standard), border-color 0.1s var(--ease-standard)',
+        animation: justDropped
+          ? 'block-drop-settle 0.32s var(--ease-spring)'
+          : block.isNewlyCreated
+            ? 'block-pop-in 0.2s var(--ease-spring)'
+            : undefined,
         cursor: getCursor(),
         userSelect: 'none',
         WebkitUserSelect: 'none',

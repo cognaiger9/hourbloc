@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 :root {
+  /* Easing curves */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   /* Core Palette - Neutrals */
   --background: #f7f6f3;
   --surface: #ffffff;
@@ -165,15 +170,48 @@ body {
   }
 }
 
-/* Block pop-in on first render */
+/* Block pop-in on first render - spring feel */
 @keyframes block-pop-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+  0%   { opacity: 0; transform: scale(0.94) translateY(3px); }
+  65%  { opacity: 1; transform: scale(1.02) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Block drop settle - subtle spring bounce on drag release */
+@keyframes block-drop-settle {
+  0%   { transform: scale(1.025); }
+  55%  { transform: scale(0.99); }
+  100% { transform: scale(1); }
+}
+
+/* Navigation slide - directional transitions between dates/weeks */
+@keyframes nav-slide-forward {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes nav-slide-backward {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* View type crossfade */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.nav-slide-forward  { animation: nav-slide-forward  0.2s var(--ease-decelerate) both; }
+.nav-slide-backward { animation: nav-slide-backward 0.2s var(--ease-decelerate) both; }
+.animate-fade-in    { animation: fade-in            0.18s var(--ease-decelerate) both; }
+
+/* Disable all animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nav-slide-forward,
+  .nav-slide-backward,
+  .animate-fade-in,
+  .timeline-bar {
+    animation: none !important;
   }
 }
 

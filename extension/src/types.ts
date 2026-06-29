@@ -18,7 +18,8 @@ export type ExtMessage =
   | { type: 'START_TIMER'; tagId: string | null; tagName: string }
   | { type: 'PAUSE_TIMER' }
   | { type: 'STOP_TIMER' }
-  | { type: 'GET_STATE' };
+  | { type: 'GET_STATE' }
+  | { type: 'START_GOOGLE_AUTH' };
 
 export type ExtResponse =
   | { ok: true; state: TimerState }

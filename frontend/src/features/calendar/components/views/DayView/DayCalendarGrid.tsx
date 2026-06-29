@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useLayoutEffect } from 'react';
 import CalendarGrid from '@/features/calendar/components/CalendarGrid';
 import TimeSidebar from '@/features/calendar/components/TimeSidebar';
 import { useScrollSync } from '@/features/calendar/hooks/useScrollSync';
@@ -32,6 +32,18 @@ export default function DayCalendarGrid({
 }: DayCalendarGridProps) {
   const timeSidebarRef = useRef<HTMLDivElement>(null);
   const gridColumnsRef = useRef<HTMLDivElement>(null);
+  const gridAnimRef = useRef<HTMLDivElement>(null);
+  const prevDateRef = useRef(date);
+
+  // Slide the grid columns in from the correct direction when navigating days
+  useLayoutEffect(() => {
+    const el = gridAnimRef.current;
+    if (!el || isSameDay(date, prevDateRef.current)) return;
+    const cls = date > prevDateRef.current ? 'nav-slide-forward' : 'nav-slide-backward';
+    el.classList.add(cls);
+    el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+    prevDateRef.current = date;
+  }, [date]);
 
   // Fetch same range as WeeklyCalendarView (7 days before, 30 days after) for cache sharing
   const startDate = useMemo(() => {
@@ -100,20 +112,22 @@ export default function DayCalendarGrid({
     <main className="flex-1 bg-white overflow-y-auto relative h-full">
       <div className="flex h-full overflow-hidden relative bg-surface">
         <TimeSidebar ref={timeSidebarRef} onScroll={handleTimeSidebarScroll} scrollTop={scrollPosition} />
-        <CalendarGrid
-          ref={gridColumnsRef}
-          dates={[date]}
-          blocks={blocks}
-          viewMode="day"
-          onGridClick={handleGridClick}
-          onBlockInteractionStart={handleBlockMouseDown}
-          gridContainerRef={gridContainerRef}
-          onScroll={handleGridColumnsScroll}
-          scrollTop={scrollPosition}
-          tags={tags}
-          onTaskDrop={onTaskDrop}
-          draggedTaskId={draggedTaskId}
-        />
+        <div ref={gridAnimRef} className="flex-1 relative overflow-hidden">
+          <CalendarGrid
+            ref={gridColumnsRef}
+            dates={[date]}
+            blocks={blocks}
+            viewMode="day"
+            onGridClick={handleGridClick}
+            onBlockInteractionStart={handleBlockMouseDown}
+            gridContainerRef={gridContainerRef}
+            onScroll={handleGridColumnsScroll}
+            scrollTop={scrollPosition}
+            tags={tags}
+            onTaskDrop={onTaskDrop}
+            draggedTaskId={draggedTaskId}
+          />
+        </div>
       </div>
     </main>
   );

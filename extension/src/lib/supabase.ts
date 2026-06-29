@@ -23,6 +23,7 @@ const chromeStorageAdapter: SupportedStorage = {
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage: chromeStorageAdapter,
+    flowType: 'pkce',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

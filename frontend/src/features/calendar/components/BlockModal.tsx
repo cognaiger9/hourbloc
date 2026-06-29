@@ -52,7 +52,8 @@ export default function BlockModal({
     if (block) {
       setTitle(block.title);
       setDescription(block.description);
-      setTag(block.tag);
+      // For newly created blocks with no tag (created before tags loaded), default to first tag
+      setTag(block.tag || (block.isNewlyCreated && tags.length > 0 ? tags[0].name : block.tag));
     } else {
       setTitle('');
       setDescription('');

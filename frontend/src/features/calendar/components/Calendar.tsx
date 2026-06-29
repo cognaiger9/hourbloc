@@ -264,32 +264,38 @@ export default function Calendar() {
 
       {/* View Content */}
       {viewType === 'todo' && (
-        <WeeklyTodoView
-          currentDate={currentDate}
-          tasks={weekTasks}
-          tags={tags}
-          onAddTask={handleAddTask}
-          onTaskClick={handleTaskClick}
-        />
+        <div key="todo" className="flex flex-1 overflow-hidden animate-fade-in">
+          <WeeklyTodoView
+            currentDate={currentDate}
+            tasks={weekTasks}
+            tags={tags}
+            onAddTask={handleAddTask}
+            onTaskClick={handleTaskClick}
+          />
+        </div>
       )}
 
       {viewType === 'day' && (
-        <DayView
-          currentDate={currentDate}
-          tasks={dayTasks}
-          tags={tags}
-          timezone={timezone}
-          onAddTask={handleAddTask}
-          onTaskClick={handleTaskClick}
-        />
+        <div key="day" className="flex flex-1 overflow-hidden animate-fade-in">
+          <DayView
+            currentDate={currentDate}
+            tasks={dayTasks}
+            tags={tags}
+            timezone={timezone}
+            onAddTask={handleAddTask}
+            onTaskClick={handleTaskClick}
+          />
+        </div>
       )}
 
       {viewType === 'calendar' && (
-        <WeeklyCalendarView
-          currentDate={currentDate}
-          tags={tags}
-          timezone={timezone}
-        />
+        <div key="calendar" className="flex flex-1 overflow-hidden animate-fade-in">
+          <WeeklyCalendarView
+            currentDate={currentDate}
+            tags={tags}
+            timezone={timezone}
+          />
+        </div>
       )}
 
       {/* Floating Block Editing Panel */}

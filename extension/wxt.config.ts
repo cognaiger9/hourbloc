@@ -10,7 +10,7 @@ export default defineConfig({
   manifest: {
     name: 'HourBloc Timer',
     description: 'Start and stop HourBloc time tracking without leaving your current tab.',
-    permissions: ['storage', 'identity', 'alarms'],
+    permissions: ['storage', 'identity', 'alarms', 'notifications'],
     host_permissions: [
       'https://iuicavihhcfzimquamwc.supabase.co/*',
       'http://localhost:8000/*',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import {
   calculateClickedDay,
@@ -14,6 +15,8 @@ import {
 } from '@/features/calendar/utils/modalPosition';
 import { useCalendarStore } from '@/features/calendar/store/calendarStore';
 import { useDeleteBlockMutation } from '@/features/calendar/hooks/useBlocks';
+import { tagKeys } from '@/lib/queryKeys';
+import { type Tag } from '@/types/tag';
 
 interface UseGridClickProps {
   gridColumnsRef: React.RefObject<HTMLDivElement | null>;
@@ -39,6 +42,7 @@ export function useGridClick({
   tags,
 }: UseGridClickProps) {
   const lastGridClickTimeRef = useRef<number>(0);
+  const queryClient = useQueryClient();
 
   // Get store state and actions (UI state only)
   const isModalOpen = useCalendarStore((state) => state.isModalOpen);
@@ -157,8 +161,10 @@ export function useGridClick({
       // Function to create the new block
       const createNewBlock = () => {
         // Create new block and add it immediately to the calendar
-        // Use first tag from database, or fallback to empty string if no tags exist
-        const defaultTag = tags.length > 0 ? tags[0].name : '';
+        // Read tags from the React Query cache at click time - it's populated by the
+        // network response even when the React prop hasn't re-rendered yet (first page load).
+        const cachedTags = queryClient.getQueryData<Tag[]>(tagKeys.all) ?? tags;
+        const defaultTag = cachedTags.length > 0 ? cachedTags[0].name : '';
 
         // Normalize date to ensure it's just the date part (no time component)
         // Clone the date to avoid mutating the original
@@ -239,6 +245,7 @@ export function useGridClick({
     isDragging,
     isResizing,
     tags,
+    queryClient,
     isModalOpen,
     selectedBlock,
     selectBlock,
