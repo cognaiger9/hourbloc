@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+:root {
+  /* Core Palette - Neutrals */
+  --background: #f7f6f3;
+  --surface: #ffffff;
+  --border: #e4e2dd;
+  --foreground: #1b1b1b;
+  --foreground-secondary: #6d6d6d;
+  
+  /* Growth-Green Accent System */
+  --accent-green: #3cbf6f;
+  --green-hover: #33ad64;
+  --green-pressed: #2e9a5a;
+  --green-light: #e9f7ef;
+  --green-border: #a4dbb9;
+  
+  /* Semantic Colors */
+  --success: #3cbf6f;
+  --warning: #e5b454;
+  --danger: #e86858;
+  --info: #5d81e4;
+  
+  /* Calendar & Time-Block Color System */
+  --time-block-fill: rgba(60, 191, 111, 0.8); /* accent green at 80% opacity */
+  --time-block-fill-hover: rgba(51, 173, 100, 0.9); /* green hover at 90% opacity */
+  --time-block-fill-selected: #2e9a5a; /* green pressed full */
+  --time-block-inactive: #dde3dd; /* subtle grey-green for inactive/past blocks */
+  --time-block-grid: #e4e2dd; /* hairline for empty slot grid lines */
+  --today-marker: #3cbf6f; /* accent green for today marker */
+
+  /* Block card accent RGB helper (used for translucent fills) */
+  --accent-green-rgb: 60, 191, 111;
+}
+
+@theme inline {
+  /* Typography */
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), "Courier New", monospace;
+
+  /* Type Scale - Numeric */
+  --font-size-64: 4rem; /* 64px */
+  --font-size-32: 2rem; /* 32px */
+  --font-size-20: 1.25rem; /* 20px */
+  --font-size-16: 1rem; /* 16px */
+  --font-size-14: 0.875rem; /* 14px */
+  --font-size-12: 0.75rem; /* 12px */
+  
+  /* Type Scale - Semantic */
+  --font-size-heading-landing: var(--font-size-64); /* Heading in landing page */
+  --font-size-page-title: var(--font-size-32); /* Page title (rare) */
+  --font-size-section-title: var(--font-size-20); /* Section title */
+  --font-size-primary: var(--font-size-16); /* Primary content (default) */
+  --font-size-secondary: var(--font-size-14); /* Secondary/meta */
+  --font-size-tertiary: var(--font-size-12); /* Tertiary/labels */
+  
+  /* Core Palette - Neutrals */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  
+  /* Growth-Green Accent System */
+  --color-accent-green: var(--accent-green);
+  --color-green-hover: var(--green-hover);
+  --color-green-pressed: var(--green-pressed);
+  --color-green-light: var(--green-light);
+  --color-green-border: var(--green-border);
+  
+  /* Semantic Colors */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  
+  /* Calendar & Time-Block Color System */
+  --color-time-block-fill: var(--time-block-fill);
+  --color-time-block-fill-hover: var(--time-block-fill-hover);
+  --color-time-block-fill-selected: var(--time-block-fill-selected);
+  --color-time-block-inactive: var(--time-block-inactive);
+  --color-time-block-grid: var(--time-block-grid);
+  --color-today-marker: var(--today-marker);
+  
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-block: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-block-hover: 0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-block-drag: 0 8px 24px rgba(0,0,0,0.14), 0 3px 8px rgba(0,0,0,0.08);
+}
+
+body {
+  background: #f7f6f3;
+  color: #1b1b1b;
+  font-family: var(--font-sans), sans-serif;
+}
+
+/* Custom scrollbar for subtle feel */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4e2dd;
+  border-radius: 4px;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Timeline animations */
+@keyframes timeline-bar-appear {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes timeline-bar-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.timeline-bar {
+  animation: timeline-bar-appear 0.3s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.timeline-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Now-line pulse glow for current time indicator */
+@keyframes now-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(60, 191, 111, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(60, 191, 111, 0);
+  }
+}
+
+/* Block pop-in on first render */
+@keyframes block-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Custom checkbox styles for backlog */
+.custom-checkbox input:checked + div {
+  background-color: #1B1B1B;
+  border-color: #1B1B1B;
+}
+
+.custom-checkbox input:checked + div svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.list-item {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  list-style: none;
+}
+
+.list-item::before,
+.list-item::after {
+  content: none;
+}
