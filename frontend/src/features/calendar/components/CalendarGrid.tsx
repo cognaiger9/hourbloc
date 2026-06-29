@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { cn } from '@/utils/common';
 import { isSameDay } from '@/utils/dateUtils';
 import { formatTime } from '@/utils/dateUtils';
@@ -50,7 +50,6 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
     const selectedBlockId = useCalendarStore((state) => state.selectedBlockId);
 
     const [dragOverHour, setDragOverHour] = useState<number | null>(null);
-    const [hoveredHour, setHoveredHour] = useState<number | null>(null);
 
     // Suppress slot hover while dragging/resizing
     const isInteracting = interactionState === 'dragging' || interactionState === 'resizing';
@@ -67,23 +66,6 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
         onScroll(gridColumnsRef.current.scrollTop);
       }
     };
-
-    // Slot hover tracking
-    const handleGridMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (isInteracting) {
-        setHoveredHour(null);
-        return;
-      }
-      const rect = gridContainerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const scrollT = gridColumnsRef && 'current' in gridColumnsRef && gridColumnsRef.current
-        ? gridColumnsRef.current.scrollTop : 0;
-      const y = e.clientY - rect.top + scrollT;
-      const hour = Math.floor(y / 60);
-      setHoveredHour(Math.max(0, Math.min(23, hour)));
-    };
-
-    const handleGridMouseLeave = () => setHoveredHour(null);
 
     // Task drag-over
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -157,6 +139,11 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
       dates.some((date) => isSameDay(block.date, date))
     );
 
+    const tagMap = useMemo(() => new Map(tags.map((t) => [t.name, t])), [tags]);
+
+    const noopClick = useCallback(() => {}, []);
+    const noopInteraction = useCallback(() => {}, []);
+
     return (
       <div className="flex-1 min-w-0 relative bg-surface">
         <div
@@ -169,8 +156,6 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
             className="flex relative bg-surface w-full cursor-pointer"
             style={{ height: '1440px' }}
             onClick={onGridClick}
-            onMouseMove={handleGridMouseMove}
-            onMouseLeave={handleGridMouseLeave}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -229,20 +214,6 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
               ))}
             </div>
 
-            {/* Slot hover band (suppressed while interacting) */}
-            {hoveredHour !== null && !isInteracting && !draggedTaskId && (
-              <div
-                className="absolute left-0 right-0 pointer-events-none"
-                style={{
-                  top: `${hoveredHour * 60}px`,
-                  height: '60px',
-                  backgroundColor: 'rgba(60, 191, 111, 0.05)',
-                  zIndex: 2,
-                  borderTop: '1px solid rgba(60, 191, 111, 0.15)',
-                  borderBottom: '1px solid rgba(60, 191, 111, 0.15)',
-                }}
-              />
-            )}
 
             {/* Current time indicator */}
             <CurrentTimeIndicator dates={dates} totalDates={dates.length} />
@@ -264,7 +235,7 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
               const topPx = displayStartTime * 60;
               const heightPx = (displayEndTime - displayStartTime) * 60;
 
-              const blockTag = tags.find(t => t.name === block.tag);
+              const blockTag = tagMap.get(block.tag);
               const tagColor = blockTag?.color;
 
               return (
@@ -275,7 +246,7 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
                   widthPercent={widthPercent}
                   topPx={topPx}
                   heightPx={heightPx}
-                  onClick={() => {}}
+                  onClick={noopClick}
                   isDragging={isDragging}
                   isResizing={isResizing}
                   isSelected={isSelected}
@@ -299,7 +270,7 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
                 const dragPreviewEnd = dragPreview.hour + (draggedBlock.endTime - draggedBlock.startTime);
                 const topPx = dragPreviewStart * 60;
                 const heightPx = (dragPreviewEnd - dragPreviewStart) * 60;
-                const dragPreviewTag = tags.find(t => t.name === draggedBlock.tag);
+                const dragPreviewTag = tagMap.get(draggedBlock.tag);
                 return (
                   <CalendarBlockItem
                     key={`drag-preview-${activeBlockId}`}
@@ -308,13 +279,13 @@ const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
                     widthPercent={widthPercent}
                     topPx={topPx}
                     heightPx={heightPx}
-                    onClick={() => {}}
+                    onClick={noopClick}
                     isDragging={false}
                     isPreview={true}
                     isResizing={false}
                     isSelected={false}
                     resizeEdge={null}
-                    onInteractionStart={() => {}}
+                    onInteractionStart={noopInteraction}
                     displayStartTime={dragPreviewStart}
                     displayEndTime={dragPreviewEnd}
                     tagColor={dragPreviewTag?.color}

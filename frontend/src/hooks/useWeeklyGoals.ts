@@ -5,15 +5,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { weeklyGoalsApi } from '@/features/weekly-goals/api/weeklyGoals';
 import { WeeklyGoal } from '@/features/weekly-goals/types';
 import { formatDateKey, getMondayOfWeek } from '@/utils/dateUtils';
+import { weeklyGoalKeys } from '@/lib/queryKeys';
 
-/**
- * Query key factory for weekly goals
- */
-export const weeklyGoalKeys = {
-  all: ['weeklyGoals'] as const,
-  lists: () => [...weeklyGoalKeys.all, 'list'] as const,
-  list: (filters: { week_start?: string }) => [...weeklyGoalKeys.lists(), filters] as const,
-};
+export { weeklyGoalKeys };
 
 /**
  * Hook to fetch weekly goals with optional week_start filtering

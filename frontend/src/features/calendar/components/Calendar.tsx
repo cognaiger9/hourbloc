@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import BlockModal from '@/features/calendar/components/BlockModal';
-import AddTaskModal from '@/features/calendar/components/AddTaskModal';
+import dynamic from 'next/dynamic';
+const BlockModal = dynamic(() => import('@/features/calendar/components/BlockModal'), { ssr: false });
+const AddTaskModal = dynamic(() => import('@/features/calendar/components/AddTaskModal'), { ssr: false });
 import DayView from '@/features/calendar/components/views/DayView/DayView';
 import WeeklyTodoView from '@/features/calendar/components/views/WeeklyTodoView/WeeklyTodoView';
 import WeeklyCalendarView from '@/features/calendar/components/views/WeeklyCalendarView/WeeklyCalendarView';

@@ -4,16 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { backlogApi } from '@/features/backlog/api/backlog';
 import { BacklogTask } from '@/features/backlog/types';
 import { formatDateKey } from '@/utils/dateUtils';
-import { taskBlueprintKeys } from '@/features/calendar/hooks/useTaskBlueprints';
+import { backlogKeys, taskBlueprintKeys } from '@/lib/queryKeys';
 
-/**
- * Query key factory for backlog tasks
- */
-export const backlogKeys = {
-  all: ['backlog'] as const,
-  lists: () => [...backlogKeys.all, 'list'] as const,
-  list: (filters: { completed?: boolean }) => [...backlogKeys.lists(), filters] as const,
-};
+export { backlogKeys };
 
 /**
  * Hook to fetch backlog tasks with optional completion filter

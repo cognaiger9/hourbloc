@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getWeekAnalytics } from '../api/analytics';
 import { ANALYTICS_QUERY_CONFIG } from '../config/queryConfig';
 import type { WeekAnalyticsData } from '../types';
+import { analyticsKeys } from '@/lib/queryKeys';
 
 interface UseWeekAnalyticsResult {
   data: WeekAnalyticsData | null;
@@ -38,13 +39,7 @@ export function useWeekAnalytics(weekStart: Date): UseWeekAnalyticsResult {
   const isThisWeek = isCurrentWeek(weekStart);
 
   // Create a stable query key using the week start date components
-  const queryKey = [
-    'analytics',
-    'week',
-    weekStart.getFullYear(),
-    weekStart.getMonth(),
-    weekStart.getDate(),
-  ];
+  const queryKey = analyticsKeys.week(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
 
   const {
     data,

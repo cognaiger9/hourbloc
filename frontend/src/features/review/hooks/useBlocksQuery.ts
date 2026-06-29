@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { ReviewBlock, ReviewStats } from '../types';
 import { getBlocksForDate } from '../api/blocks';
 import { useUser } from '@/contexts/UserContext';
+import { blockKeys } from '@/lib/queryKeys';
 
 /**
  * Query configuration for blocks
@@ -75,7 +76,7 @@ export function useBlocksQuery(date: Date) {
     : BLOCKS_QUERY_CONFIG.HISTORICAL;
 
   // Create stable query key
-  const queryKey = ['blocks', date.toDateString(), timezone];
+  const queryKey = blockKeys.forDate(date.toDateString(), timezone);
 
   const query = useQuery({
     queryKey,

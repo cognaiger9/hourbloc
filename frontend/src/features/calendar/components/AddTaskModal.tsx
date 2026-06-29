@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { X, ChevronDown, Archive } from 'lucide-react';
 import { useTagCreation } from '@/hooks/useTagCreation';
 import EditTagModal from '@/components/EditTagModal';
@@ -51,11 +51,14 @@ export default function AddTaskModal({
   });
 
   // Filter weekly goals for current week
-  const currentWeekGoals = weeklyGoals.filter((goal) => {
+  const currentWeekGoals = useMemo(() => weeklyGoals.filter((goal) => {
     const goalWeekStart = getMondayOfWeek(goal.weekStart);
     const currentWeekStart = getMondayOfWeek(date);
     return goalWeekStart.getTime() === currentWeekStart.getTime() && !goal.completed;
-  });
+  }), [weeklyGoals, date]);
+
+  const selectedTagObj = useMemo(() => tags.find((t) => t.name === selectedTag), [tags, selectedTag]);
+  const selectedGoalObj = useMemo(() => currentWeekGoals.find((g) => g.id === selectedGoal), [currentWeekGoals, selectedGoal]);
 
 
   // Handle click outside to close dropdowns
@@ -126,9 +129,6 @@ export default function AddTaskModal({
     onSave(taskData);
     onClose();
   };
-
-  const selectedTagObj = tags.find((t) => t.name === selectedTag);
-  const selectedGoalObj = currentWeekGoals.find((g) => g.id === selectedGoal);
 
   return (
     <>

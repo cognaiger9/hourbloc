@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getYearAnalytics } from '../api/analytics';
 import { ANALYTICS_QUERY_CONFIG } from '../config/queryConfig';
 import type { YearAnalyticsData } from '../types';
+import { analyticsKeys } from '@/lib/queryKeys';
 
 interface UseYearAnalyticsResult {
   data: YearAnalyticsData | null;
@@ -20,7 +21,7 @@ export function useYearAnalytics(year: number): UseYearAnalyticsResult {
   const isCurrentYear = year === currentYear;
 
   // Create a stable query key using the year
-  const queryKey = ['analytics', 'year', year];
+  const queryKey = analyticsKeys.year(year);
 
   const {
     data,

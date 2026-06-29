@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import { formatTime } from '@/utils/dateUtils';
 
@@ -30,7 +30,7 @@ function hexToRgb(hex: string): string {
   return `${r}, ${g}, ${b}`;
 }
 
-export default function CalendarBlockItem({
+export default memo(function CalendarBlockItem({
   block,
   leftPercent,
   widthPercent,
@@ -49,7 +49,7 @@ export default function CalendarBlockItem({
 }: CalendarBlockItemProps) {
   // Use theme accent green for untagged blocks — fix the #10b981 mismatch
   const blockColor = tagColor || '#3cbf6f';
-  const rgb = hexToRgb(blockColor);
+  const rgb = useMemo(() => hexToRgb(blockColor), [blockColor]);
 
   const [hoveredEdge, setHoveredEdge] = useState<'top' | 'bottom' | null>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -267,4 +267,4 @@ export default function CalendarBlockItem({
       )}
     </div>
   );
-}
+});

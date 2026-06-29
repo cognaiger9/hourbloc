@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Tag } from '@/types/tag';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import { TaskBlueprint } from '@/features/calendar/types/taskBlueprint';
@@ -59,22 +59,20 @@ export default function WeeklyTodoView({ currentDate, tasks, tags, onAddTask, on
   });
 
   // Handle task click - convert CalendarBlock back to TaskBlueprint
-  const handleTaskClick = (block: CalendarBlock) => {
+  const handleTaskClick = useCallback((block: CalendarBlock) => {
     if (!onTaskClick) return;
-
-    // Find the original task from the query data
     const originalTask = tasks.find((task) => task.id === block.id);
     if (originalTask) {
       onTaskClick(originalTask);
     }
-  };
+  }, [tasks, onTaskClick]);
 
   // Handle toggle task completion
-  const handleToggleComplete = async (taskId: string) => {
+  const handleToggleComplete = useCallback(async (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
     await toggleCompletion.mutateAsync({ taskId, currentCompleted: task.completed });
-  };
+  }, [tasks, toggleCompletion]);
 
   return (
     <main ref={containerRef} className={`flex-1 overflow-x-auto overflow-y-hidden p-8 ${cursorClass}`}>

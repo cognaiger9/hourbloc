@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { Check } from 'lucide-react';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import { Tag } from '@/types/tag';
@@ -13,14 +14,14 @@ interface TaskCardProps {
   onClick?: (block: CalendarBlock) => void;
 }
 
-export default function TaskCard({
+export default memo(function TaskCard({
   block,
   tag,
   isCompleted = false,
   onToggleComplete,
   onClick,
 }: TaskCardProps) {
-  const tagStyles = tag ? getTagColorStyles(tag.color) : null;
+  const tagStyles = useMemo(() => tag ? getTagColorStyles(tag.color) : null, [tag?.color]);
 
   const handleClick = () => {
     if (onClick) {
@@ -79,4 +80,4 @@ export default function TaskCard({
       </div>
     </div>
   );
-}
+});

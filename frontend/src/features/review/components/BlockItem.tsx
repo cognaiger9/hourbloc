@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { ReviewBlock } from '../types';
 
@@ -9,7 +10,7 @@ interface BlockItemProps {
   onDelete: (block: ReviewBlock) => void;
 }
 
-export default function BlockItem({ block, onEdit, onDelete }: BlockItemProps) {
+export default memo(function BlockItem({ block, onEdit, onDelete }: BlockItemProps) {
   return (
     <article className="group bg-surface rounded-lg border border-border shadow-[0_1px_2px_rgba(0,0,0,0.05)] p-5 transition-all hover:shadow-md hover:border-black/10">
       <div className="flex flex-col gap-1">
@@ -64,4 +65,4 @@ export default function BlockItem({ block, onEdit, onDelete }: BlockItemProps) {
       </div>
     </article>
   );
-}
+});

@@ -3,7 +3,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { CalendarBlock } from '@/features/calendar/types/calendarBlock';
 import { useCalendarStore } from '@/features/calendar/store/calendarStore';
-import { blockKeys } from '@/features/calendar/hooks/useBlocks';
+import { blockKeys } from '@/lib/queryKeys';
 
 /**
  * Find block by ID - checks store (single temp) then cache (saved)

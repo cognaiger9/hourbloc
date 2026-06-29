@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { BacklogTask } from '../types';
 
 interface BacklogItemProps {
@@ -8,7 +9,7 @@ interface BacklogItemProps {
   onEdit?: (task: BacklogTask) => void;
 }
 
-export default function BacklogItem({
+export default memo(function BacklogItem({
   task,
   onToggleComplete,
   onEdit,
@@ -69,4 +70,4 @@ export default function BacklogItem({
       </span>
     </div>
   );
-}
+});

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import GoalItem from './GoalItem';
 import AddGoalButton from './AddGoalButton';
 import { WeeklyGoal } from '../types';
@@ -17,8 +18,8 @@ export default function WeeklyGoalsList({
   onAddGoalClick,
   onEditGoal,
 }: WeeklyGoalsListProps) {
-  const activeGoals = goals.filter((g) => !g.completed);
-  const completedGoals = goals.filter((g) => g.completed);
+  const activeGoals = useMemo(() => goals.filter((g) => !g.completed), [goals]);
+  const completedGoals = useMemo(() => goals.filter((g) => g.completed), [goals]);
 
   return (
     <section className="flex flex-col w-full">

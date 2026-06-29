@@ -4,6 +4,7 @@
  */
 
 import { useQueryClient } from '@tanstack/react-query';
+import { analyticsKeys, blockKeys } from '@/lib/queryKeys';
 
 export function useInvalidateAnalytics() {
   const queryClient = useQueryClient();
@@ -17,10 +18,10 @@ export function useInvalidateAnalytics() {
    */
   const invalidateAll = () => {
     queryClient.invalidateQueries({
-      queryKey: ['analytics'],
+      queryKey: analyticsKeys.all,
     });
     queryClient.invalidateQueries({
-      queryKey: ['blocks'],
+      queryKey: blockKeys.all,
     });
   };
 

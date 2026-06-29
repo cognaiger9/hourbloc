@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useReviewBlocks } from '@/features/review/hooks/useReviewBlocks';
 import { useDateNavigation } from '@/features/review/hooks/useDateNavigation';
 import { useBlockOperations } from '@/features/review/hooks/useBlockOperations';
 import { useTagsQuery } from '@/hooks/useTags';
 import DeleteBlockModal from '@/features/review/components/DeleteBlockModal';
-import CreateBlockModal from '@/features/review/components/CreateBlockModal';
 import ReviewHeader from '@/features/review/components/ReviewHeader';
 import BlockList from '@/features/review/components/BlockList';
 import { ReviewBlock } from '@/features/review/types';
+
+const CreateBlockModal = dynamic(() => import('@/features/review/components/CreateBlockModal'), { ssr: false });
 
 export default function ReviewPage() {
   const { currentDate, isToday, navigateDate, goToToday } = useDateNavigation();
@@ -31,10 +33,10 @@ export default function ReviewPage() {
     onSuccess: () => setCreateModalOpen(false),
   });
 
-  const handleDeleteClick = (block: ReviewBlock) => {
+  const handleDeleteClick = useCallback((block: ReviewBlock) => {
     setBlockToDelete(block);
     setDeleteModalOpen(true);
-  };
+  }, []);
 
   const handleDeleteConfirm = async () => {
     if (blockToDelete) {
@@ -48,9 +50,9 @@ export default function ReviewPage() {
     }
   };
 
-  const handleEditClick = (block: ReviewBlock) => {
+  const handleEditClick = useCallback((block: ReviewBlock) => {
     setEditingBlockId(block.id);
-  };
+  }, []);
 
   const handleSaveEdit = async (blockId: string, updatedBlock: Partial<ReviewBlock>) => {
     try {

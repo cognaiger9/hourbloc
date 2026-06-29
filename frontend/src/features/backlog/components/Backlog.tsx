@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import BacklogHeader from './BacklogHeader';
 import BacklogTabs from './BacklogTabs';
 import BacklogList from './BacklogList';
@@ -41,11 +41,11 @@ export default function Backlog() {
       .sort((a, b) => a.order - b.order);
   }, [tasks, activeTab]);
 
-  const handleToggleComplete = (taskId: string) => {
+  const handleToggleComplete = useCallback((taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
     toggleMutation.mutate({ taskId, currentCompleted: task.completed });
-  };
+  }, [tasks, toggleMutation]);
 
   const handleAddTask = async (data: { text: string; description?: string }) => {
     await createMutation.mutateAsync({
@@ -55,10 +55,10 @@ export default function Backlog() {
     });
   };
 
-  const handleEditTask = (task: BacklogTask) => {
+  const handleEditTask = useCallback((task: BacklogTask) => {
     setEditingTask(task);
     setIsModalOpen(true);
-  };
+  }, []);
 
   const handleUpdateTask = async (data: { text: string; description?: string }) => {
     if (!editingTask) return;

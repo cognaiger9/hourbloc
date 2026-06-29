@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReviewBlock } from '../types';
 import { createBlock, updateBlock, deleteBlock } from '../api/blocks';
 import { formatMinutes, formatTimeRange } from '@/utils/dateUtils';
+import { analyticsKeys, blockKeys } from '@/lib/queryKeys';
 
 /**
  * Hook for creating a new block with optimistic updates
@@ -35,7 +36,7 @@ export function useCreateBlockMutation() {
     },
     // Optimistic update
     onMutate: async ({ date, timezone, block }) => {
-      const queryKey = ['blocks', date.toDateString(), timezone];
+      const queryKey = blockKeys.forDate(date.toDateString(), timezone);
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
@@ -70,11 +71,11 @@ export function useCreateBlockMutation() {
     // On success, invalidate all blocks and analytics
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['blocks'],
+        queryKey: blockKeys.all,
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
-        queryKey: ['analytics'],
+        queryKey: analyticsKeys.all,
         refetchType: 'active',
       });
     },
@@ -114,7 +115,7 @@ export function useUpdateBlockMutation() {
     },
     // Optimistic update
     onMutate: async ({ date, timezone, blockId, updates }) => {
-      const queryKey = ['blocks', date.toDateString(), timezone];
+      const queryKey = blockKeys.forDate(date.toDateString(), timezone);
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
@@ -147,11 +148,11 @@ export function useUpdateBlockMutation() {
     // On success, invalidate all blocks and analytics
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['blocks'],
+        queryKey: blockKeys.all,
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
-        queryKey: ['analytics'],
+        queryKey: analyticsKeys.all,
         refetchType: 'active',
       });
     },
@@ -176,7 +177,7 @@ export function useDeleteBlockMutation() {
     },
     // Optimistic update
     onMutate: async ({ date, timezone, blockId }) => {
-      const queryKey = ['blocks', date.toDateString(), timezone];
+      const queryKey = blockKeys.forDate(date.toDateString(), timezone);
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
@@ -194,11 +195,11 @@ export function useDeleteBlockMutation() {
     // On success, invalidate all blocks and analytics
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['blocks'],
+        queryKey: blockKeys.all,
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
-        queryKey: ['analytics'],
+        queryKey: analyticsKeys.all,
         refetchType: 'active',
       });
     },

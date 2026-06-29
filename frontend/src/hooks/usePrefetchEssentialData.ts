@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { tagsApi } from '@/utils/api/tagsApi';
 import { type StoredTag } from '@/types/tag';
+import { tagKeys } from '@/lib/queryKeys';
 
 // Shared conversion logic (same as useTags.ts)
 function apiTagsToTags(apiTags: StoredTag[]) {
@@ -24,7 +25,7 @@ export function usePrefetchEssentialData() {
 
     // Prefetch tags using same config as useTagsQuery
     await queryClient.prefetchQuery({
-      queryKey: ['tags'],
+      queryKey: tagKeys.all,
       queryFn: async () => {
         console.log('[usePrefetchEssentialData] Fetching tags...');
         const apiTags = await tagsApi.getAll();

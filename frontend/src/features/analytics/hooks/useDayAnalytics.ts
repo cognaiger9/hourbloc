@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getDayAnalytics } from '../api/analytics';
 import { ANALYTICS_QUERY_CONFIG } from '../config/queryConfig';
 import type { DayAnalyticsData } from '../types';
+import { analyticsKeys } from '@/lib/queryKeys';
 
 interface UseDayAnalyticsResult {
   data: DayAnalyticsData | null;
@@ -24,13 +25,7 @@ export function useDayAnalytics(date: Date): UseDayAnalyticsResult {
     date.getFullYear() === now.getFullYear();
 
   // Create a stable query key using the date components
-  const queryKey = [
-    'analytics',
-    'day',
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-  ];
+  const queryKey = analyticsKeys.day(date.getFullYear(), date.getMonth(), date.getDate());
 
   const {
     data,

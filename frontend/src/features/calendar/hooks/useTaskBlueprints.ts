@@ -4,16 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { taskBlueprintsApi } from '@/features/calendar/api/taskBlueprints';
 import { TaskBlueprint } from '@/features/calendar/types/taskBlueprint';
 import { formatDateKey } from '@/utils/dateUtils';
+import { taskBlueprintKeys } from '@/lib/queryKeys';
 
-/**
- * Query key factory for task blueprints
- */
-export const taskBlueprintKeys = {
-  all: ['taskBlueprints'] as const,
-  lists: () => [...taskBlueprintKeys.all, 'list'] as const,
-  list: (filters: { date?: string; start_date?: string; end_date?: string }) =>
-    [...taskBlueprintKeys.lists(), filters] as const,
-};
+export { taskBlueprintKeys };
 
 /**
  * Hook to fetch task blueprints with optional date filtering

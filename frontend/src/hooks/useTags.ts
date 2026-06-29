@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { tagsApi } from '@/utils/api/tagsApi';
 import { type StoredTag, type Tag } from '@/types/tag';
+import { tagKeys } from '@/lib/queryKeys';
 
 // Convert API tags to UI tags
 function apiTagsToTags(apiTags: StoredTag[]): Tag[] {
@@ -21,7 +22,7 @@ function apiTagsToTags(apiTags: StoredTag[]): Tag[] {
  */
 export function useTagsQuery() {
   return useQuery({
-    queryKey: ['tags'],
+    queryKey: tagKeys.all,
     queryFn: async () => {
       const apiTags = await tagsApi.getAll();
       return apiTagsToTags(apiTags);
@@ -45,10 +46,10 @@ export function useCreateTagMutation() {
     // Optimistic update
     onMutate: async (newTagData) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['tags'] });
+      await queryClient.cancelQueries({ queryKey: tagKeys.all });
 
       // Snapshot previous value
-      const previousTags = queryClient.getQueryData<Tag[]>(['tags']);
+      const previousTags = queryClient.getQueryData<Tag[]>(tagKeys.all);
 
       // Create optimistic tag
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -59,24 +60,25 @@ export function useCreateTagMutation() {
       };
 
       // Optimistically update cache
-      queryClient.setQueryData<Tag[]>(['tags'], (old = []) => [...old, optimisticTag]);
+      queryClient.setQueryData<Tag[]>(tagKeys.all, (old = []) => [...old, optimisticTag]);
 
       return { previousTags, tempId };
     },
-    // On success, replace optimistic tag with real one
+    // On success, replace optimistic tag with real one then re-sync
     onSuccess: (createdTag, _variables, context) => {
-      queryClient.setQueryData<Tag[]>(['tags'], (old = []) =>
+      queryClient.setQueryData<Tag[]>(tagKeys.all, (old = []) =>
         old.map((tag) =>
           tag.id === context?.tempId
             ? { id: createdTag.id, name: createdTag.name, color: createdTag.color }
             : tag
         )
       );
+      queryClient.invalidateQueries({ queryKey: tagKeys.all });
     },
     // On error, rollback
     onError: (_error, _variables, context) => {
       if (context?.previousTags) {
-        queryClient.setQueryData(['tags'], context.previousTags);
+        queryClient.setQueryData(tagKeys.all, context.previousTags);
       }
     },
   });
@@ -95,10 +97,10 @@ export function useUpdateTagMutation() {
     // Optimistic update
     onMutate: async ({ id, updates }) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['tags'] });
+      await queryClient.cancelQueries({ queryKey: tagKeys.all });
 
       // Snapshot previous value
-      const previousTags = queryClient.getQueryData<Tag[]>(['tags']);
+      const previousTags = queryClient.getQueryData<Tag[]>(tagKeys.all);
 
       // Optimistically update cache
       queryClient.setQueryData<Tag[]>(['tags'], (old = []) =>
@@ -111,20 +113,21 @@ export function useUpdateTagMutation() {
 
       return { previousTags };
     },
-    // On success, update with real data
+    // On success, update with real data then re-sync
     onSuccess: (updatedTag) => {
-      queryClient.setQueryData<Tag[]>(['tags'], (old = []) =>
+      queryClient.setQueryData<Tag[]>(tagKeys.all, (old = []) =>
         old.map((tag) =>
           tag.id === updatedTag.id
             ? { id: updatedTag.id, name: updatedTag.name, color: updatedTag.color }
             : tag
         )
       );
+      queryClient.invalidateQueries({ queryKey: tagKeys.all });
     },
     // On error, rollback
     onError: (_error, _variables, context) => {
       if (context?.previousTags) {
-        queryClient.setQueryData(['tags'], context.previousTags);
+        queryClient.setQueryData(tagKeys.all, context.previousTags);
       }
     },
   });
@@ -143,22 +146,25 @@ export function useDeleteTagMutation() {
     // Optimistic update
     onMutate: async (tagId) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['tags'] });
+      await queryClient.cancelQueries({ queryKey: tagKeys.all });
 
       // Snapshot previous value
-      const previousTags = queryClient.getQueryData<Tag[]>(['tags']);
+      const previousTags = queryClient.getQueryData<Tag[]>(tagKeys.all);
 
       // Optimistically remove from cache
-      queryClient.setQueryData<Tag[]>(['tags'], (old = []) =>
+      queryClient.setQueryData<Tag[]>(tagKeys.all, (old = []) =>
         old.filter((tag) => tag.id !== tagId)
       );
 
       return { previousTags };
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tagKeys.all });
+    },
     // On error, rollback
     onError: (_error, _variables, context) => {
       if (context?.previousTags) {
-        queryClient.setQueryData(['tags'], context.previousTags);
+        queryClient.setQueryData(tagKeys.all, context.previousTags);
       }
     },
   });

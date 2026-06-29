@@ -7,6 +7,9 @@ import { parseLocalTimeISO } from '@/utils/timezoneUtils';
 import { trackCalendarEvent } from '@/utils/analytics/calendarEvents';
 import { trackActivationMilestone } from '@/utils/analytics/activationEvents';
 import { useCalendarStore } from '@/features/calendar/store/calendarStore';
+import { blockKeys } from '@/lib/queryKeys';
+
+export { blockKeys };
 
 /**
  * Format Date to YYYY-MM-DD string for stable cache keys
@@ -15,16 +18,6 @@ function formatDateForCacheKey(date: Date | undefined): string | undefined {
   if (!date) return undefined;
   return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
 }
-
-/**
- * Query key factory for blocks
- */
-export const blockKeys = {
-  all: ['blocks'] as const,
-  lists: () => [...blockKeys.all, 'list'] as const,
-  list: (filters: { block_type?: string; start_date?: string; end_date?: string }) =>
-    [...blockKeys.lists(), filters] as const,
-};
 
 /**
  * Hook to fetch blocks with optional filtering
@@ -158,6 +151,8 @@ export function useCreateBlockMutation(timezone: string) {
         return [...old, realBlock];
       });
 
+      queryClient.invalidateQueries({ queryKey: blockKeys.all });
+
       // Track analytics
       const duration = Math.round((variables.endTime - variables.startTime) * 60);
       trackCalendarEvent.blockCreated({
@@ -237,6 +232,8 @@ export function useUpdateBlockMutation(timezone: string) {
         if (!old) return old;
         return old.map((b) => (b.id === updatedBlock.id ? realBlock : b));
       });
+
+      queryClient.invalidateQueries({ queryKey: blockKeys.all });
 
       // Track analytics
       trackCalendarEvent.blockEdited({

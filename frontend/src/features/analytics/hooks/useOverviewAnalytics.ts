@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getOverviewAnalytics } from '../api/analytics';
 import { ANALYTICS_QUERY_CONFIG } from '../config/queryConfig';
+import { analyticsKeys } from '@/lib/queryKeys';
 import type {
   TodayData,
   LifetimeData,
@@ -32,7 +33,7 @@ export function useOverviewAnalytics(month: number, year: number) {
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
 
   return useQuery({
-    queryKey: ['analytics', 'overview', month, year],
+    queryKey: analyticsKeys.overview(month, year),
     queryFn: () => getOverviewAnalytics(month, year),
     // Current month: shorter TTL (data changes frequently)
     // Past months: longer TTL (historical, immutable)

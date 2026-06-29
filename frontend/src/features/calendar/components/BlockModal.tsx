@@ -59,7 +59,7 @@ export default function BlockModal({
       setTag(tags.length > 0 ? tags[0].name : '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [block?.id, block?.title, block?.description, block?.tag, tags]);
+  }, [block?.id, block?.title, block?.description, block?.tag, tags.map(t => t.id).join(',')]);
 
 
   // Calculate optimal position for floating panel
